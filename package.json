@@ -1,7 +1,7 @@
 {
         "name": "bunyan-syslog",
         "description": "Syslog Stream for Bunyan",
-        "version": "0.1.0",
+        "version": "0.1.1",
         "author": "Mark Cavage",
         "main": "./lib/index.js",
         "dependencies": {
