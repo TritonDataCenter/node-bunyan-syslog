@@ -16,7 +16,7 @@ that consumes `raw` records from bunyan and sends them to a syslog server.
 		    level: 'debug',
             type: 'raw',
             stream: bsyslog.createSyslogStream({
-                facility: bsyslog.local0,
+                facility: bsyslog.facility.local0,
 				host: '192.168.0.1',
 				port: 514
             })
