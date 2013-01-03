@@ -1,13 +1,19 @@
 {
         "name": "bunyan-syslog",
-        "description": "UDP Syslog Stream for Bunyan",
+        "description": "Syslog Stream for Bunyan",
         "version": "0.1.0",
         "author": "Mark Cavage",
-        "main": "./lib/stream.js",
+        "main": "./lib/index.js",
         "dependencies": {
                 "assert-plus": "0.1.2",
                 "bunyan": "0.16.8",
                 "moment": "1.7.2"
+        },
+        "devDependencies": {
+                "tap": "0.3.3"
+        },
+        "scripts": {
+                "test": "tap test"
         },
         "engines": {
                 "node": ">=0.8"
