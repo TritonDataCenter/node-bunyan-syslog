@@ -17,7 +17,7 @@ JSL_FILES_NODE   = $(JS_FILES)
 JSSTYLE_FILES	 = $(JS_FILES)
 JSSTYLE_FLAGS    = -f tools/jsstyle.conf
 
-CLEAN_FILES += ./node_modules
+CLEAN_FILES += ./node_modules build
 
 include ./tools/mk/Makefile.defs
 include ./tools/mk/Makefile.node_deps.defs

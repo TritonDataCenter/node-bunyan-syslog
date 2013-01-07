@@ -19,16 +19,15 @@ var STREAM;
 
 test('create a logger', function (t) {
         STREAM = bsyslog.createBunyanStream({
-                host: process.env.LOG_HOST,
-                port: parseInt(process.env.TCP_LOG_PORT || 10514, 10),
-                facility: bsyslog.facility.local0,
-                type: 'tcp'
+                name: 'sys_test',
+                facility: bsyslog.local0,
+                type: 'sys'
         });
         t.ok(STREAM);
         console.error(STREAM.toString());
 
         LOG = bunyan.createLogger({
-                name: 'tcptest',
+                name: 'systest',
                 streams: [ {
                         type: 'raw',
                         level: 'trace',

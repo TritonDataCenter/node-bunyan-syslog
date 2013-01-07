@@ -24,6 +24,7 @@ test('create a logger', function (t) {
                 facility: bsyslog.facility.local0
         });
         t.ok(STREAM);
+        console.error(STREAM.toString());
 
         LOG = bunyan.createLogger({
                 name: 'udptest',
