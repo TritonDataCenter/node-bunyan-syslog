@@ -73,7 +73,7 @@ Handle<Value> Log(const Arguments& args) {
 	REQUIRE_INT_ARG(args, 0, priority);
 	REQUIRE_STRING_ARG(args, 1, message);
 
-	syslog(priority, *message);
+	syslog(priority, "%s", *message);
 
 	return (Undefined());
 }
@@ -122,7 +122,6 @@ void init(Handle<Object> target) {
 	NODE_DEFINE_CONSTANT(target, LOG_NEWS);
 	NODE_DEFINE_CONSTANT(target, LOG_UUCP);
 	NODE_DEFINE_CONSTANT(target, LOG_CRON);
-	NODE_DEFINE_CONSTANT(target, LOG_AUDIT);
 	NODE_DEFINE_CONSTANT(target, LOG_LOCAL0);
 	NODE_DEFINE_CONSTANT(target, LOG_LOCAL1);
 	NODE_DEFINE_CONSTANT(target, LOG_LOCAL2);
