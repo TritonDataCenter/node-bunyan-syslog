@@ -25,7 +25,6 @@ test('create a logger', function (t) {
                 type: 'tcp'
         });
         t.ok(STREAM);
-        console.error(STREAM.toString());
 
         LOG = bunyan.createLogger({
                 name: 'tcptest',
