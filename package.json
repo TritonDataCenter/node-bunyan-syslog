@@ -9,7 +9,8 @@
         "url": "git://github.com/mcavage/node-bunyan-syslog.git"
     },
     "dependencies": {
-        "assert-plus": "0.1.4"
+        "assert-plus": "0.1.4",
+        "bindings": "^1.2.1"
     },
     "devDependencies": {
         "bunyan": "0.21.4",
