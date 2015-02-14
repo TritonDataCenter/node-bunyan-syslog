@@ -4,17 +4,18 @@
 
 #include <node.h>
 #include <v8.h>
+#include <nan.h>
 
 using namespace v8;
 
 #define RETURN_EXCEPTION(MSG)                                           \
-	return ThrowException(Exception::Error(String::New(MSG)))
+	NanThrowError(MSG)
 
 #define RETURN_ARGS_EXCEPTION(MSG)                                      \
-	return ThrowException(Exception::TypeError(String::New(MSG)))
+	NanThrowError(MSG)
 
 #define RETURN_ERRNO_EXCEPTION(RC, API, MSG)				\
-	return ThrowException(node::ErrnoException(RC, API, MSG))
+	NanThrowError(node::ErrnoException(RC, API, MSG))
 
 #define RETURN_OOM_EXCEPTION()						\
 	RETURN_ERRNO_EXCEPTION(ENOMEM, "malloc", strerror(ENOMEM))
@@ -53,9 +54,8 @@ using namespace v8;
 
 ///--- API
 
-
-Handle<Value> Open(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(Open) {
+	NanScope();
 
 	REQUIRE_STRING_ARG(args, 0, ident);
 	REQUIRE_INT_ARG(args, 1, logopt);
@@ -63,41 +63,37 @@ Handle<Value> Open(const Arguments& args) {
 
 	openlog(strdup(*ident), logopt, facility);
 
-	return (Undefined());
+	NanReturnUndefined();
 }
 
-
-Handle<Value> Log(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(Log) {
+	NanScope();
 
 	REQUIRE_INT_ARG(args, 0, priority);
 	REQUIRE_STRING_ARG(args, 1, message);
 
 	syslog(priority, "%s", *message);
 
-	return (Undefined());
+	NanReturnUndefined();
 }
 
-
-Handle<Value> Close(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(Close) {
+	NanScope();
 
 	closelog();
 
-	return (Undefined());
+	NanReturnUndefined();
 }
 
-
-Handle<Value> Mask(const Arguments& args) {
-	HandleScope scope;
+NAN_METHOD(Mask) {
+	NanEscapableScope();
 
 	REQUIRE_INT_ARG(args, 0, maskpri);
 
 	int mask = setlogmask(LOG_UPTO(maskpri));
 
-	return (scope.Close(Integer::New(mask)));
+	NanReturnValue(NanEscapeScope(NanNew<Integer>(mask)));
 }
-
 
 void init(Handle<Object> target) {
 	NODE_SET_METHOD(target, "openlog", Open);
