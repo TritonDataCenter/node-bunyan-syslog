@@ -13,6 +13,8 @@ var I = 0;
 var LOG;
 var STREAM;
 
+var NEWLOG;
+var NEWSTREAM;
 
 
 ///--- Tests
@@ -75,7 +77,56 @@ test('write a fatal record', function (t) {
 });
 
 
+if (bunyan.createLevel) {
+        test('create a logger with mapped levels', function (t) {
+                NEWSTREAM = bsyslog.createBunyanStream({
+                        name: 'sys_mapped_test',
+                        facility: bsyslog.local0,
+                        type: 'sys',
+                        mapping: {
+                                60: 'emergency',
+                                50: 'error',
+                                40: 'warning',
+                                35: 'notice',
+                                30: 'info'
+                        }
+                });
+                t.ok(NEWSTREAM);
+                console.error(NEWSTREAM.toString());
+
+                if (bunyan.createLevel) {
+                        bunyan.createLevel('notice', 35);
+                }
+                NEWLOG = bunyan.createLogger({
+                        name: 'sysmappedtest',
+                        streams: [ {
+                                type: 'raw',
+                                level: 'trace',
+                                stream: NEWSTREAM
+                        } ]
+                });
+                t.ok(NEWLOG);
+                NEWSTREAM.once('connect', t.end.bind(t));
+        });
+
+
+        test('write a notice record', function (t) {
+                NEWLOG.notice({i: I++}, 'sample %s record', 'notice');
+                t.end();
+        });
+
+
+        test('write an info record', function (t) {
+                NEWLOG.info({i: I++}, 'sample %s record', 'info');
+                t.end();
+        });
+}
+
 test('teardown', function (t) {
         STREAM.close();
+        if (NEWSTREAM) {
+                NEWSTREAM.close();
+        }
         t.end();
 });
+
