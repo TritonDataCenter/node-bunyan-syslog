@@ -9,13 +9,13 @@
 using namespace v8;
 
 #define RETURN_EXCEPTION(MSG)                                           \
-	NanThrowError(MSG)
+	Nan::ThrowError(MSG)
 
 #define RETURN_ARGS_EXCEPTION(MSG)                                      \
-	NanThrowError(MSG)
+	Nan::ThrowError(MSG)
 
 #define RETURN_ERRNO_EXCEPTION(RC, API, MSG)				\
-	NanThrowError(node::ErrnoException(RC, API, MSG))
+	Nan::ThrowError(node::ErrnoException(RC, API, MSG))
 
 #define RETURN_OOM_EXCEPTION()						\
 	RETURN_ERRNO_EXCEPTION(ENOMEM, "malloc", strerror(ENOMEM))
@@ -55,51 +55,51 @@ using namespace v8;
 ///--- API
 
 NAN_METHOD(Open) {
-	NanScope();
+	Nan::HandleScope scope;
 
-	REQUIRE_STRING_ARG(args, 0, ident);
-	REQUIRE_INT_ARG(args, 1, logopt);
-	REQUIRE_INT_ARG(args, 2, facility);
+	REQUIRE_STRING_ARG(info, 0, ident);
+	REQUIRE_INT_ARG(info, 1, logopt);
+	REQUIRE_INT_ARG(info, 2, facility);
 
 	openlog(strdup(*ident), logopt, facility);
 
-	NanReturnUndefined();
+	return;
 }
 
 NAN_METHOD(Log) {
-	NanScope();
+	Nan::HandleScope scope;
 
-	REQUIRE_INT_ARG(args, 0, priority);
-	REQUIRE_STRING_ARG(args, 1, message);
+	REQUIRE_INT_ARG(info, 0, priority);
+	REQUIRE_STRING_ARG(info, 1, message);
 
 	syslog(priority, "%s", *message);
 
-	NanReturnUndefined();
+	return;
 }
 
 NAN_METHOD(Close) {
-	NanScope();
+	Nan::HandleScope scope;
 
 	closelog();
 
-	NanReturnUndefined();
+	return;
 }
 
 NAN_METHOD(Mask) {
-	NanEscapableScope();
+	Nan::EscapableHandleScope scope;
 
-	REQUIRE_INT_ARG(args, 0, maskpri);
+	REQUIRE_INT_ARG(info, 0, maskpri);
 
 	int mask = setlogmask(LOG_UPTO(maskpri));
 
-	NanReturnValue(NanEscapeScope(NanNew<Integer>(mask)));
+	info.GetReturnValue().Set(scope.Escape(Nan::New<Integer>(mask)));
 }
 
 void init(Handle<Object> target) {
-	NODE_SET_METHOD(target, "openlog", Open);
-	NODE_SET_METHOD(target, "syslog", Log);
-	NODE_SET_METHOD(target, "closelog", Close);
-	NODE_SET_METHOD(target, "setlogmask", Mask);
+	Nan::SetMethod(target, "openlog", Open);
+	Nan::SetMethod(target, "syslog", Log);
+	Nan::SetMethod(target, "closelog", Close);
+	Nan::SetMethod(target, "setlogmask", Mask);
 
 	NODE_DEFINE_CONSTANT(target, LOG_EMERG);
 	NODE_DEFINE_CONSTANT(target, LOG_ALERT);
