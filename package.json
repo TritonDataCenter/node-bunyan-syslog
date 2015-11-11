@@ -3,6 +3,7 @@
   "description": "Syslog Stream for Bunyan",
   "version": "0.3.0",
   "author": "Mark Cavage",
+  "license": "MIT",
   "main": "./lib/index.js",
   "repository": {
     "type": "git",
@@ -20,6 +21,6 @@
     "test": "tap test"
   },
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=0.10.0"
   }
 }
