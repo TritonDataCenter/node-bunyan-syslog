@@ -1,0 +1,8 @@
+deps
+tools
+build
+test
+.gitmodules
+.npmignore
+*.tgz
+Makefile
