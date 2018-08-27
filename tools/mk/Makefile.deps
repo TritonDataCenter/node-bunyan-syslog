@@ -1,6 +1,14 @@
 # -*- mode: makefile -*-
 #
-# Copyright (c) 2012, Joyent, Inc. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+#
+# Copyright (c) 2017, Joyent, Inc.
+#
+
 #
 # Makefile.deps: Makefile for including common tools as dependencies
 #
@@ -37,8 +45,43 @@ JSSTYLE		?= $(JSSTYLE_EXEC)
 $(JSSTYLE_EXEC): | deps/jsstyle/.git
 
 #
+# eslint
+#
+ESLINT_EXEC	?= node_modules/.bin/eslint
+ifdef NODE
+    ESLINT	:= $(NODE) $(ESLINT_EXEC)
+else
+    ESLINT	?= $(ESLINT_EXEC)
+endif
+
+# Install eslint.
+#
+# The install of specific modules is to allow running "make check"
+# without having to do a complete install of all npm dependencies.
+#
+# NPM_EXEC will be defined if either of "Makefile.{node,node_prebuilt}.defs"
+# is included.
+ifdef NPM
+$(ESLINT_EXEC): package.json | $(NPM_EXEC)
+	ESLINT_VER=$$($(NODE) -e 'console.log(require("./package.json").devDependencies["eslint"] || "")') && \
+	    ESLINT_JOY_VER=$$($(NODE) -e 'console.log(require("./package.json").devDependencies["eslint-plugin-joyent"] || "")') && \
+	    [[ -n $$ESLINT_VER && -n $$ESLINT_JOY_VER ]] && \
+	    $(NPM) install --no-save eslint@$$ESLINT_VER eslint-plugin-joyent@$$ESLINT_JOY_VER && \
+	    touch $(ESLINT_EXEC)
+else
+$(ESLINT_EXEC): package.json
+	ESLINT_VER=$$(node -e 'console.log(require("./package.json").devDependencies["eslint"] || "")') && \
+	    ESLINT_JOY_VER=$$(node -e 'console.log(require("./package.json").devDependencies["eslint-plugin-joyent"] || "")') && \
+	    [[ -n $$ESLINT_VER && -n $$ESLINT_JOY_VER ]] && \
+	    npm install --no-save eslint@$$ESLINT_VER eslint-plugin-joyent@$$ESLINT_JOY_VER && \
+	    touch $(ESLINT_EXEC)
+endif
+
+#
 # restdown
 #
 RESTDOWN_EXEC	?= deps/restdown/bin/restdown
 RESTDOWN	?= python $(RESTDOWN_EXEC)
 $(RESTDOWN_EXEC): | deps/restdown/.git
+
+EXTRA_DOC_DEPS	?=

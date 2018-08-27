@@ -1,6 +1,13 @@
-# -*- mode: makefile -*-
 #
-# Copyright (c) 2012, Joyent, Inc. All rights reserved.
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+#
+# Copyright (c) 2018, Joyent, Inc.
+#
+
 #
 # Makefile.defs: common defines.
 #
@@ -19,6 +26,14 @@
 #	TIMESTAMP	The timestamp for the build. This can be set via
 #			the TIMESTAMP envvar (used by MG-based builds).
 #	STAMP		A build stamp to use in built package names.
+#
+#	MAKE_STAMPS_DIR	The directory in which make stamp files are to be
+#			created.  See comments below on expensive targets.
+#
+#	CACHE_DIR	A directory tree in which temporary files may be
+#			collected by download, tarball extraction, etc.  This
+#			directory is completely removed by "make distclean".
+#			Files in this directory are not intended to be shipped.
 #
 
 TOP := $(shell pwd)
@@ -41,3 +56,50 @@ STAMP := $(BRANCH)-$(TIMESTAMP)-$(_GITDESCRIBE)
 
 # node-gyp will print build info useful for debugging with V=1
 export V=1
+
+CACHE_DIR ?=		cache
+DISTCLEAN_FILES +=	$(CACHE_DIR)
+
+#
+# EXPENSIVE TARGETS AND MAKE STAMP FILES
+#
+# Targets which are expensive to run and lack a single file that marks
+# completion are difficult to track with make; e.g., "npm install".  One
+# solution to this problem is to create "stamp" files with symbolic names which
+# are created as the final step in a complex make rule in order to mark
+# completion.
+#
+# In order to make these more uniform, and easier to target with "make clean",
+# we will attempt to store them under a single directory.  Note that these
+# files are never targets for shipping in build artefacts.
+#
+# Stamp-backed targets come in several parts.  First, a macro should be defined
+# which names a file in the MAKE_STAMPS_DIR directory.  Then, a target which
+# creates this stamp file must be provided.  The recipe for this target should
+# use MAKE_STAMP_REMOVE and MAKE_STAMP_CREATE to perform the appropriate stamp
+# management.
+#
+# For example:
+#
+# --- Makefile.*.defs:
+#
+#	$(STAMP_EXPENSIVE_RESULT) := $(MAKE_STAMPS_DIR)/expensive-result
+#
+# --- Makefile.*.targ:
+#
+#	$(STAMP_EXPENSIVE_RESULT): input/file another/input/file
+#		$(MAKE_STAMP_REMOVE)
+#		rm -rf output_tree/  # <--- ensure a clean slate
+#		expensive_program -o output_tree/ $^
+#		$(MAKE_STAMP_CREATE)
+#
+# NOTE: Every stamp file is exposed as an implicit "stamp-$STAMP_NAME" target.
+# The example above could be built manually by invoking:
+#
+#	make stamp-expensive-result
+#
+MAKE_STAMPS_DIR ?=	make_stamps
+CLEAN_FILES +=		$(MAKE_STAMPS_DIR)
+
+MAKE_STAMP_REMOVE =	mkdir -p $(@D); rm -f $(@)
+MAKE_STAMP_CREATE =	mkdir -p $(@D); touch $(@)

@@ -1,24 +1,28 @@
 {
   "name": "bunyan-syslog",
   "description": "Syslog Stream for Bunyan",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "author": "Mark Cavage",
   "license": "MIT",
   "main": "./lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/mcavage/node-bunyan-syslog.git"
+    "url": "git://github.com/joyent/node-bunyan-syslog.git"
   },
   "dependencies": {
     "assert-plus": "0.1.5",
-    "nan": "2.4.x"
+    "nan": "^2.10.0"
   },
   "devDependencies": {
-    "bunyan": "1.5.x",
-    "tap": "0.6.0"
+    "bunyan": "^1.8.12",
+    "istanbul": "^0.3.6",
+    "faucet": "0.0.1",
+    "tape": "^3.5.0",
+    "eslint": "^4.13.1",
+    "eslint-plugin-joyent": "~2.1.0"
   },
   "scripts": {
-    "test": "tap test"
+    "test": "./node_modules/.bin/istanbul cover --print none test/run.js"
   },
   "engines": {
     "node": ">=0.10.0"

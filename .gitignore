@@ -1,9 +1,12 @@
+/build
+/coverage
+/node
 /node_modules
 /tmp
-build
+/package-lock.json
+*.log
 docs/*.json
 docs/*.html
 cscope.in.out
 cscope.po.out
 cscope.out
-npm-debug.log

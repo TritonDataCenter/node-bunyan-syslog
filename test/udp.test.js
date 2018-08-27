@@ -1,13 +1,16 @@
-// Copyright 2013 Mark Cavage, Inc.  All rights reserved.
+/*
+ * Copyright 2013 Mark Cavage, Inc.  All rights reserved.
+ * Copyright (c) 2018, Joyent, Inc.
+ */
 
 var bunyan = require('bunyan');
-var test = require('tap').test;
+var test = require('tape');
 
 var bsyslog = require('../lib');
 
 
 
-///--- Globals
+// --- Globals
 
 var I = 0;
 var LOG;
@@ -15,16 +18,16 @@ var STREAM;
 
 
 
-///--- Tests
+// --- Tests
 
 test('create a logger', function (t) {
         STREAM = bsyslog.createBunyanStream({
                 host: process.env.LOG_HOST,
-                port: parseInt(process.env.LOG_PORT || 514, 10),
+                port: parseInt(process.env.LOG_PORT || 10514, 10),
                 facility: bsyslog.facility.local0
         });
         t.ok(STREAM);
-        console.error(STREAM.toString());
+        t.equal(typeof (STREAM.toString()), 'string');
 
         LOG = bunyan.createLogger({
                 name: 'udptest',
