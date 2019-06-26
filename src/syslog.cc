@@ -28,14 +28,14 @@ using namespace v8;
 	REQUIRE_ARGS(ARGS);						\
 	if (ARGS.Length() <= (I) || !ARGS[I]->IsNumber())		\
 		RETURN_ARGS_EXCEPTION("argument " #I " must be an Integer"); \
-	Local<Integer> _ ## VAR(ARGS[I]->ToInteger());			\
-	int VAR = _ ## VAR->Value();
+        int32_t VAR = Nan::To<int32_t>(ARGS[I]).FromMaybe(0);
+
 
 #define REQUIRE_STRING_ARG(ARGS, I, VAR)				\
 	REQUIRE_ARGS(ARGS);						\
 	if (ARGS.Length() <= (I) || !ARGS[I]->IsString())		\
 		RETURN_ARGS_EXCEPTION("argument " #I " must be a String"); \
-	String::Utf8Value VAR(ARGS[I]->ToString());
+        std::string VAR = *Nan::Utf8String(Nan::To<v8::String>(ARGS[I]).ToLocalChecked());
 
 #define REQUIRE_FUNCTION_ARG(ARGS, I, VAR)                              \
 	REQUIRE_ARGS(ARGS);						\
@@ -61,7 +61,7 @@ NAN_METHOD(Open) {
 	REQUIRE_INT_ARG(info, 1, logopt);
 	REQUIRE_INT_ARG(info, 2, facility);
 
-	openlog(strdup(*ident), logopt, facility);
+   	openlog(strdup(ident.c_str()), logopt, facility);
 
 	return;
 }
@@ -72,7 +72,7 @@ NAN_METHOD(Log) {
 	REQUIRE_INT_ARG(info, 0, priority);
 	REQUIRE_STRING_ARG(info, 1, message);
 
-	syslog(priority, "%s", *message);
+	syslog(priority, "%s", message.c_str());
 
 	return;
 }
@@ -95,7 +95,7 @@ NAN_METHOD(Mask) {
 	info.GetReturnValue().Set(scope.Escape(Nan::New<Integer>(mask)));
 }
 
-void init(Handle<Object> target) {
+NAN_MODULE_INIT(init) {
 	Nan::SetMethod(target, "openlog", Open);
 	Nan::SetMethod(target, "syslog", Log);
 	Nan::SetMethod(target, "closelog", Close);
