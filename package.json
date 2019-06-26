@@ -11,13 +11,14 @@
   },
   "dependencies": {
     "assert-plus": "0.1.5",
-    "nan": "^2.10.0"
+    "nan": "^2.14.0",
+    "safer-buffer": "~2.1.0"
   },
   "devDependencies": {
     "bunyan": "^1.8.12",
     "istanbul": "^0.3.6",
     "faucet": "0.0.1",
-    "tape": "^3.5.0",
+    "tape": "^4.11.0",
     "eslint": "^4.13.1",
     "eslint-plugin-joyent": "~2.1.0"
   },

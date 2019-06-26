@@ -14,42 +14,27 @@ using namespace v8;
 #define RETURN_ARGS_EXCEPTION(MSG)                                      \
 	Nan::ThrowError(MSG)
 
-#define RETURN_ERRNO_EXCEPTION(RC, API, MSG)				\
-	Nan::ThrowError(node::ErrnoException(RC, API, MSG))
-
-#define RETURN_OOM_EXCEPTION()						\
-	RETURN_ERRNO_EXCEPTION(ENOMEM, "malloc", strerror(ENOMEM))
-
 #define REQUIRE_ARGS(ARGS)					\
 	if (ARGS.Length() == 0)					\
 		RETURN_ARGS_EXCEPTION("missing arguments");
 
 #define REQUIRE_INT_ARG(ARGS, I, VAR)                                   \
 	REQUIRE_ARGS(ARGS);						\
-	if (ARGS.Length() <= (I) || !ARGS[I]->IsNumber())		\
+	if (ARGS.Length() <= (I))					\
 		RETURN_ARGS_EXCEPTION("argument " #I " must be an Integer"); \
-	Local<Integer> _ ## VAR(ARGS[I]->ToInteger());			\
-	int VAR = _ ## VAR->Value();
+	Nan::MaybeLocal<v8::Integer> _ ## VAR(Nan::To<v8::Integer>(ARGS[I])); \
+	if (_ ## VAR.IsEmpty())					\
+		RETURN_ARGS_EXCEPTION("argument " #I " must be an Integer"); \
+	int VAR = _ ## VAR.ToLocalChecked()->Value();
 
 #define REQUIRE_STRING_ARG(ARGS, I, VAR)				\
 	REQUIRE_ARGS(ARGS);						\
-	if (ARGS.Length() <= (I) || !ARGS[I]->IsString())		\
+	if (ARGS.Length() <= (I))					\
 		RETURN_ARGS_EXCEPTION("argument " #I " must be a String"); \
-	String::Utf8Value VAR(ARGS[I]->ToString());
-
-#define REQUIRE_FUNCTION_ARG(ARGS, I, VAR)                              \
-	REQUIRE_ARGS(ARGS);						\
-	if (ARGS.Length() <= (I) || !ARGS[I]->IsFunction())		\
-		RETURN_EXCEPTION("argument " #I " must be a Function");	\
-	Local<Function> VAR = Local<Function>::Cast(ARGS[I]);
-
-
-#define REQUIRE_OBJECT_ARG(ARGS, I, VAR)				\
-	REQUIRE_ARGS(ARGS);						\
-	if (ARGS.Length() <= (I) || !ARGS[I]->IsObject())		\
-		RETURN_EXCEPTION("argument " #I " must be an Object");	\
-	Local<Object> VAR(ARGS[I]->ToObject());
-
+	Nan::MaybeLocal<v8::String> _ ## VAR(Nan::To<v8::String>(ARGS[I])); \
+	if (_ ## VAR.IsEmpty())					\
+		RETURN_ARGS_EXCEPTION("argument " #I " must be a String"); \
+	Nan::Utf8String VAR(_ ## VAR.ToLocalChecked());
 
 
 ///--- API
@@ -95,7 +80,7 @@ NAN_METHOD(Mask) {
 	info.GetReturnValue().Set(scope.Escape(Nan::New<Integer>(mask)));
 }
 
-void init(Handle<Object> target) {
+NAN_MODULE_INIT(init) {
 	Nan::SetMethod(target, "openlog", Open);
 	Nan::SetMethod(target, "syslog", Log);
 	Nan::SetMethod(target, "closelog", Close);

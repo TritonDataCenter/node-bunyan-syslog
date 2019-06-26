@@ -77,7 +77,7 @@ This module maps bunyan levels to syslog levels as follows:
 You can run the test suite using the provided `rsyslog` configuration:
 
 ```
-$ rsyslogd -f ./test/rsyslog.conf -i ./test.pid -u $USER
+$ rsyslogd -f ./test/rsyslog.conf -i $PWD/test.pid -u $USER
 $ make test
 $ kill $(cat test.pid)
 ```
