@@ -1,13 +1,20 @@
 {
   "name": "bunyan-syslog",
   "description": "Syslog Stream for Bunyan",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "author": "Mark Cavage",
   "license": "MIT",
   "main": "./lib/index.js",
+  "keywords": [
+    "bunyan",
+    "syslog"
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/joyent/node-bunyan-syslog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/joyent/node-bunyan-syslog/issues"
   },
   "dependencies": {
     "assert-plus": "0.1.5",
