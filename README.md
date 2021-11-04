@@ -31,7 +31,10 @@ log.debug({foo: 'bar'}, 'hello %s', 'world');
 That's pretty much it.  You create a syslog stream, and point it at a syslog
 server (UDP by default; you can force TCP by setting `type: tcp` in the
 constructor); default is to use facility `user` and a syslog server on
-`127.0.0.1:514`.  Note you *must* pass `type: 'raw'` to bunyan in the top-level
+`127.0.0.1:514`. When using TCP and Node 0.10 or above, you can unref the socket
+by setting `unref: true` in the constructor.
+
+Note you *must* pass `type: 'raw'` to bunyan in the top-level
 stream object or this won't work.
 
 If you want your logs to be in the normal bunyan format, `rsyslog` allows you to
